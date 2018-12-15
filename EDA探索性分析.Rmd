@@ -1,0 +1,95 @@
+---
+title: "EDA探索性分析"
+author: "shydow"
+date: "2018年12月12日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##EDA探索性分析
+探索性数据分析（EDA）是数据项目的第一步，我们将创建一个代码模板来实现这一功能，EDA一般由单个变量（1个变量）和双变量分析组成  
+
+**第一步：取得并了解数据**  
+**第二步：分析分类变量**  
+**第三步：分析数值变量**  
+**第四部：同时分析数值和分类变量**  
+
+基本EDA中的一些关键点：  
+
+**数据类型**  
+**异常值**  
+**缺失值**  
+**数值和分类变量的分布（数字和图形的格式）**  
+
+###分析结果的类型
+
+*信息型*  
+绘图或者任何长变量概要，我们无法从中过滤数据，但是他会立即提供大量的信息，用于描述性分析阶段  
+*操作型*  
+这类结果直接用于数据工作流（其中，选择缺失比例低于20%的变量），用于数据准备阶段  
+
+```{r}
+library(tidyverse)
+library(Hmisc)
+library(funModeling)
+
+basic_eda<-function(data){
+  glimpse(data)
+  df_status(data)
+  freq(data)
+  profiling_num(data)
+  plot_num(data)
+  describe(data)
+}
+
+basic_eda(heart_disease)
+```
+##了解数据
+
+###glimpse()函数
+glimpse()函数类似str()函数，给出该数据的观测数（记录数）和字段（变量），在heart_disease中有303条记录和16个变量，同时给出各个变量的类型。  
+
+###df_status()函数
+df_status()函数返回一个表格，其中包括数据中每一个变量的零值个数，NA值个数，变量类型，唯一值等
+一般经常与subset联合使用  
+如：
+             ***subset(data,data$p_na<20)   筛选出有至少80%的非空值***  
+             ***unique<=50  有少于50个唯一值***  
+在做此操作时：  
+1、所有变量都是正确的数据类型  
+2、有含有很多零或空值的变量码  
+3、有高基数变量吗  
+
+
+##分析分类变量
+
+###freq()函数
+freq()函数能够自动的统计数据集中所有因子和字符变量，每个字段中，每一类个数和所占比例以绘图方式给出  
+需要存储图片使用：freq(data,path_out=".")   --这里存储在当前路径中  
+
+
+##分析数值变量
+
+**绘制图表**  
+###plot_num()\profiling_num()函数
+  
+1、找出极度偏态分布的变量  
+2、作图检查任何有异常值的变量  
+存储图片：plot_num(data,path_out=".")  
+
+**定量分析**  
+###profiling_num()函数
+profiling_num()函数自动统计数值型或者整型变量  
+给出一系列的统计指标，在写分析报告时有用
+
+##同时分析数值和分类变量
+
+###使用Hmisc包的describe()函数
+
+
+
+
+

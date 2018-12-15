@@ -1,0 +1,123 @@
+---
+title: "定量资料的统计描述"
+author: "shydow"
+date: "2018年12月11日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##学习目标
+1、集中趋势与离散趋势描述的常用统计量  
+2、正太分布的特征及其作用意义  
+3、summary() sapply()  describe()等函数进行资料的定量统计描述  
+4、aggregate() summaryBy() describeBy() 等函数进行资料的分组描述    
+
+重点：  
+一组数据的集中趋势通常用平均数、中位数和众数等来表示，描述一组数据的离散趋势只要用极差、四分位间距、方差、标准差、标准误和变异系数来表示  
+
+注：离散系数：   离散系数=标准差/均值*100%  
+
+正态分布：记为 X~N(μ，var)  μ：描述集中趋势  var:标准差，离散程度  
+
+1、μ是正态分布的位置参数，描述正态分布的集中趋势，以X=μ为对称轴，左右完全对称，正态分布的均值、中位数、众数都等于μ  
+2、var描述数据的离散程度，越大越离散，越小越集中，同时也是形状参数，越大越扁平  
+
+##定量统计分析
+
+###summary()函数
+```{r}
+data<-runif(50,70,80)
+data
+summary(data)
+```
+
+从上面可以看出最小值，下四分位数，中位数，均值，上四分位数，最大值  
+
+###sapply()函数
+
+用法：sapply(x,fun,options)  
+x就是数据框，fun位任意一个函数，options用来规定fun。  
+```{r}
+sadata<-runif(50,50,100)
+sadata
+sadata<-unlist(sadata)
+sadata<-data.frame(sadata)
+colnames(sadata)<-c('rate')
+myfun<-function(x){
+  x<-x[!is.na(x)]   #这里可以使用na.omit()
+  m<-mean(x)
+  s<-sd(x)
+  n<-length(x)
+  return(c(mean=m,sd=s,n=n))
+}
+sapply(data[1],myfun)
+```
+
+###describe()函数  
+这里使用psych包  
+```{r}
+dedata<-read.csv('F:\\课件\\资源\\《R语言统计分析与应用》配套程序\\第六章\\example6_5.csv',header=TRUE,sep=',')
+library(psych)
+
+describe(dedata[,2])
+
+```
+
+###stat.desc()函数
+需要加载pastecs包  
+具体用法：  
+stat.desc(x,basic=true,desc=true,norm=false,p=0.95)  
+basic=true,计算所有值，空值，缺失值数量，以及最小值，最大值，值域和总和  
+desc=true,计算中位数、均值、均数标准误、方差、标准差、变异系数  
+norm=true,计算正态分布统计量、包括偏度与峰度（以及他们的统计显著程度）  
+```{r}
+library(pastecs)
+stat_data<-read.csv('F:\\课件\\资源\\《R语言统计分析与应用》配套程序\\第六章\\example6_6.csv',header=TRUE)
+
+stat.desc(stat_data$sales,basic = TRUE,desc = TRUE,norm = TRUE)
+
+```
+
+##分组计算描述统计分析
+
+###aggregate()函数
+用法：aggregate(x,by,FUN)  
+x是指待处理的数据对象，by是指一个变量名组成的列表，即以什么变量进行分组，FUN是指描述性统计变量的函数  
+```{r}
+example6_7<-read.csv('F:\\课件\\资源\\《R语言统计分析与应用》配套程序\\第六章\\example6_6.csv',header=TRUE)
+head(example6_7)
+aggregate(example6_7$sales,by=list(product=example6_7$product),mean)
+```
+
+###by()函数
+by()函数可以返回若干的统计量  
+by(x,indices,fun) x计算字段，indices分组因子，fun函数
+```{r}
+example6_8<-read.csv('F:\\课件\\资源\\《R语言统计分析与应用》配套程序\\第六章\\example6_6.csv')
+myfun1<-function(x){
+  m=mean(x)
+  n=length(x)
+  s=sd(x)
+  return(c(m,n,s))
+}
+by(example6_8$sales,example6_8$product,myfun1)
+```
+
+###describeBy()函数
+```{r}
+example6_9<-read.csv('F:\\课件\\资源\\《R语言统计分析与应用》配套程序\\第六章\\example6_6.csv')
+library(psych)
+describeBy(example6_9$sales,example6_9$product)
+```
+
+###summaryBy()函数
+summaryBy()函数需要加载doBy包
+```{r}
+library(doBy)
+summaryBy(sales~product,data = example6_9,FUN = mean)
+```
+
+
