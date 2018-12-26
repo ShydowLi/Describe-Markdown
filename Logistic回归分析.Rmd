@@ -1,0 +1,83 @@
+---
+title: "Logistic回归分析"
+author: "shydow"
+date: "2018年12月21日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###学习目标以及内容
+
+    --logistics回归模型的建立与假设检验
+    --模型系数的解释，以及回归系数与or值之间的关系
+    --哑变量的设置和结果的解释
+    --逐步回归过程和系数的解释
+    
+    --logistics回归不是直接分析y与x的关系，而是分析y取某个值的概率P与x的关系。即寻找一个连续函数，使得当X变化的时候，对应的函数值P不超过[0，1]范围。
+    --logistics回归的基本原理：利用一组数据拟合一个logistics回归模型，然后借助这个模型揭示总体中若干个自变量与一个因变量取某个值的概率之间的关系。可以从统计意义上估计出在其他自变量固定不变的情况下，每个自变量对因变量取某个值的概率的数值影影响大小。
+    
+    --logistics回归： 条件回归与非条件回归
+    
+    
+##非条件logistics回归
+
+    研究Y取某个值的概率P=α+β1X1+.....βmXm   --该方程不合适，左右的函数的值域是不一样的
+    
+    故需要将P进行logit变换：则 logit(P) 与 α+β1X1+.....βmXm 间呈线性关系,即：
+    
+               logit(P)=α+β1X1+.....βmXm
+               
+    化简：
+           P=P(y=1|x)=exp(α+βx)/1+exp(α+βx) 或者 1-P=1/（1+exp(α+βx)） P为响应变脸为1的情况
+               
+    注：logit(P)=ln(p/1-p)=α+β1X1+.....βmXm  
+    
+    
+```{r}
+
+library(ggplot2)
+x<-seq(-10,10,0.01)
+y<-exp(x)/(1+exp(x))
+
+ggplot(data = NULL,aes(x,y))+geom_line(color='blue')+ggtitle('logistic回归曲线')
+
+
+```
+               
+###非条件logistics回归模型的建立和检验
+
+    估计参数：根据收集到的X变量和Y变量的观察值，估计回归系数和回归系数估计值的标准误，在logistics回归中，估计方法通常采用最大似然法，即估计参数α和β
+    
+    最大似然法：选取使得总体真参数落在样本观察值领域里的概率达到最大的参数值作为真参数的估计值
+    
+    回归系数α和β的最大似然估计值：
+                
+                α'=ln(b/d)
+                β'=ln(ad/bc)
+                
+    模型拟合度检验（logistic）：
+    
+    1、AIC检验法：同一数据下不同模型，AIC值越小，模型越合适
+    2、SC检验法：同一数据不同模型，SC值越小越合适
+    
+    
+    在R中用glm()函数进行logistics回归分析
+    基本形式： glm(formula, family=family(link = function), data= )
+    
+    family(概率分布)和相应默认的链接函数(function)：
+    --binomial  (link='logit')
+    --gaussian  (link='identity')
+    --gamma     (link='inverse')
+    
+    与函数glm()连用的常用函数：
+    --summary() :展示拟合模型细节
+    --anova() :方差分析表
+    
+    --coefficients()\ coef():拟合模型的参数 （截距项与斜率）
+    --residulas() :残差值
+    
+    
+    
